@@ -1,0 +1,89 @@
+<!--
+"""
+                      \ | /
+                    '-.;;;.-'
+                   -==;;;;;==-
+                    .-';;;'-.
+                      / | \
+                        '
+ _____       _           ______
+/  ___|     | |          | ___ \
+\ `--.  ___ | | __ _ _ __| |_/ / ___ _ __ _ __ _   _
+ `--. \/ _ \| |/ _` | '__| ___ \/ _ \ '__| '__| | | |
+/\__/ / (_) | | (_| | |  | |_/ /  __/ |  | |  | |_| |
+\____/ \___/|_|\__,_|_|  \____/ \___|_|  |_|   \__, |
+Solarberry Monitoring System                    __/ |
+by Sam Gray, 2018                              |___/
+
+SolarBerry Monitoring System   Copyright (C) 2018  Sam Gray - www.sagray.co.uk
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+-->
+<html>
+<head>
+<title>
+Solarberry Config
+</title>
+    <script src="js/jquery.js"></script>
+<script>
+ ws = new WebSocket("ws://192.168.42.1:5678/"),
+        messages = document.createElement('ul');
+
+    ws.onopen = function() {
+    	console.log("connected");
+        $('body').css("background-color", "#6EFF7F");
+    };
+
+    ws.onclose = function() {
+        console.log("socket closed");
+        $('body').css("background-color", "#FF7575");
+    };
+
+    $( document ).ready(function() {
+
+    $(".offbutton").click(function() {
+    	console.log("sending a request to turn off the power");
+    	ws.send(JSON.stringify({'power':0}));
+    });
+
+    $(".onbutton").click(function() {
+    	console.log("sending a request to turn on the power");
+    	ws.send(JSON.stringify({'power':1}));
+    });
+
+    $(".calibratebutton").click(function() {
+    	console.log("sending a request to calibrate");
+    	ws.send(JSON.stringify({'calibrate':1}));
+    });
+
+	});
+
+   
+</script>
+</head>
+<body>
+<h1>Solarberry Config</h1>
+<hr/>
+<h2>Power Control</h2>
+<button type="button" class="onbutton" value="on">Turn power ON</button>
+<br/>
+<button type="button" class="offbutton" value="off">Turn power OFF</button>
+<hr/>
+<h2>Battery Control</h2>
+<button type="button" class="calibratebutton" value="calibrate">Calibrate (Set battery level to 100%)</button>
+<hr/>
+</body>
+</html>

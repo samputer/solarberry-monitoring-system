@@ -1,0 +1,246 @@
+/*set no gutter - used in the top status row*/
+
+.no-gutter > [class*='col-'] {
+    padding-right: 0;
+    padding-left: 0;
+    vertical-align: middle;
+    /*This isnt actually related, to do with the status bar specifically*/
+}
+
+.row {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+
+/*arrow*/
+
+.statusblockarrow {
+    position: relative;
+    top: 0px;
+}
+
+.loader {
+    height: 5px;
+    background: #5ecb96;
+    position: relative;
+}
+
+.loader span {
+    position: absolute;
+    display: block;
+    height: 5px;
+    width: 10px;
+    box-shadow: #5ecb96 0 0 15px;
+    animation: animate 2s infinite ease-in-out;
+    opacity: 0;
+}
+
+.loader span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.loader span:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+.loader span:nth-child(3) {
+    animation-delay: 1s;
+}
+
+.loader span:nth-child(4) {
+    animation-delay: 1.5s;
+}
+
+@keyframes animate {
+    0% {
+        left: 0;
+        opacity: 0;
+    }
+    10% {
+        opacity: 0;
+        left: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 0;
+        left: calc(100% - 10px);
+    }
+    100% {
+        opacity: 0;
+        left: calc(100% - 10px);
+    }
+}
+
+
+/*statusbar images*/
+
+.statusbarimage {
+    width: 70px;
+    height: 70px;
+}
+
+.helptext {
+    float: right;
+    padding-top: 10px;
+}
+
+
+/*Trying to center uneven cols*/
+
+.row.text-center > div {
+    display: inline-block;
+    float: none;
+}
+
+
+/*Fancy menu bar (with a centre and l+r)*/
+
+.navbar-brand {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.navbar-inverse .navbar-brand {
+    color: white;
+}
+
+.navbar-toggle {
+    z-index: 3;
+}
+
+.navbar-right {
+    padding-right: 30px;
+}
+
+.navbar li {
+    color: white;
+}
+
+.navbar a {
+    color: white;
+}
+
+
+/* Sticky footer styles
+-------------------------------------------------- */
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    /*margin-bottom: 60px;*/
+    background-color: white;
+}
+
+.footer {
+    position: absolute;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 50px;
+    background-color: #f5f5f5;
+    line-height: 40%;
+    padding-top: 10px;
+    vertical-align: middle;
+}
+
+.footer h1 {
+    font-size: 1em;
+}
+
+.panel-body {
+    padding: 0px;
+}
+
+#websocket_status {
+    padding-top: 10px;
+}
+
+.attribution {
+    padding-top: 10px;
+    cursor: pointer;
+}
+
+.helpbutton {
+    cursor: pointer;
+}
+
+#websocket_status {
+    cursor: pointer;
+}
+
+
+/*thermometer*/
+
+#thermovalue {
+    position: relative;
+    top: -142px;
+    left: 45px;
+    font-size: 15px;
+}
+
+
+/*lcd*/
+
+.lcdcontainer {
+    height: 100%;
+    width: 50px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.lcd {
+    width: 50px;
+    height: 25px;
+}
+
+
+/*modal*/
+
+.volunteers {
+    width: 50%;
+    margin: auto;
+}
+
+.volunteers img {
+    width: 200px;
+}
+
+#graph1_container {
+    height: 150px;
+}
+
+
+/*Graph 2*/
+
+#graph2_container {
+    height: 130px;
+}
+
+.chartswitcher_r {
+    float: right;
+}
+
+.chartswitcher_l {
+    float: left;
+}
+
+#graph2avgsum {}
+
+#graph2sumbtn {}
+
+.chart2update {}

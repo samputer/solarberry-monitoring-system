@@ -1,0 +1,405 @@
+<!--
+"""
+                      \ | /
+                    '-.;;;.-'
+                   -==;;;;;==-
+                    .-';;;'-.
+                      / | \
+                        '
+ _____       _           ______
+/  ___|     | |          | ___ \
+\ `--.  ___ | | __ _ _ __| |_/ / ___ _ __ _ __ _   _
+ `--. \/ _ \| |/ _` | '__| ___ \/ _ \ '__| '__| | | |
+/\__/ / (_) | | (_| | |  | |_/ /  __/ |  | |  | |_| |
+\____/ \___/|_|\__,_|_|  \____/ \___|_|  |_|   \__, |
+Solarberry Monitoring System                    __/ |
+by Sam Gray, 2018                              |___/
+
+SolarBerry Monitoring System   Copyright (C) 2018  Sam Gray - www.sagray.co.uk
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>SolarBerry Monitoring System</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+    body {
+        padding-top: 70px;
+        /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+    }
+    </style>
+    <link href="css/solarberry.css" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <link rel="shortcut icon" href="images/dashboard-icon.png">
+        <!-- Load c3.css -->
+    <link href="vendor/c3/c3.css" rel="stylesheet" type="text/css">
+    <!-- Load d3.js and c3.js -->
+    <!-- <script src="/path/to/d3.v3.min.js" charset="utf-8"></script> -->
+    <script src="vendor/c3/c3.min.js"></script>
+    <!-- jQuery Version 1.11.1 -->
+    <script src="js/jquery.js"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/sevenSeg.js"></script>
+    <script src="js/solarberry.js"></script>
+    <!-- d3 is required for rickshaw -->
+    <script src="js/d3.min.js"></script>
+    <!-- <script src="https://d3js.org/d3.v3.min.js"></script> -->
+    <!-- rickshaw is our graphing library -->
+    <script src="vendor/rickshaw/rickshaw.min.js"></script>
+    <link rel="stylesheet" href="vendor/rickshaw/rickshaw.min.css">
+    <!-- Thermometer -->
+    <script type="text/javascript" src="vendor/thermometer/js/jquery.thermometer.js"></script>
+    <!-- Overlay -->
+<!--     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery.loadingoverlay/latest/loadingoverlay.min.js"></script>
+ -->
+    <script type="text/javascript" src="js/loadingoverlay.min.js"></script>
+ </head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <h1 class="navbar-brand" href="#"><span class="glyphicon glyphicon-dashboard"></span> SolarBerry Monitoring System</h1>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-left">
+                <li><a href="#about"><span class="glyphicon glyphicon glyphicon-arrow-left"></span> Back to RACHEL</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href='' id='date_time'></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Page Content -->
+    <div class="container">
+        <!-- Top image-based status bar -->
+        <div class="row no-gutter text-center align-middle">
+            <div class="col-lg-2 text-center">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Sun <sup class="helptext"><a data-toggle="modal" data-target="#sunmodal"><span class="glyphicon glyphicon-question-sign helpbutton"></sup></a></h3>
+                    </div>
+                    <div class="panel-body">
+                        <img src="images/sun.png" class="statusbarimage">
+                    </div>
+                    <div class="panel-footer">
+                        <span>Irradiance (W/m²):</span>
+                        <div style='background-color:black'>
+                            <div class='lcdcontainer'>
+                                <div class='lcd' id='irradiance'></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1 text-center">
+                <div id="container" class="statusblockarrow">
+                    <div class="loader">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 text-center">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Solar Panels <sup class="helptext"><a data-toggle="modal" data-target="#inputmodal"><span class="glyphicon glyphicon-question-sign helpbutton"></sup></a></h3>
+                    </div>
+                    <div class="panel-body">
+                        <img src="images/solarpanel.png" class="statusbarimage">
+                    </div>
+                    <div class="panel-footer">
+                        <span>Voltage:</span>
+                        <div style='background-color:black'>
+                            <div class='lcdcontainer'>
+                                <div class='lcd' id="voltage_in"></div>
+                            </div>
+                        </div>
+                        <span>Current:</span>
+                        <div style='background-color:black'>
+                            <div class='lcdcontainer'>
+                                <div class='lcd' id="current_in"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1 text-center">
+                <div id="container" class="statusblockarrow">
+                    <div class="loader">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 text-center">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Battery <sup class="helptext"><a data-toggle="modal" data-target="#batterymodal"><span class="glyphicon glyphicon-question-sign helpbutton"></sup></a></h3>
+                    </div>
+                    <div class="panel-body">
+                        <img src="images/battery.png" class="statusbarimage">
+                    </div>
+                    <div class="panel-footer">
+                        <span>Voltage:</span>
+                        <div style='background-color:black'>
+                            <div class='lcdcontainer'>
+                                <div class='lcd' id="voltage_out"></div>
+                            </div>
+                        </div>
+                        <span>Percent:</span>
+                        <div style='background-color:black'>
+                            <div class='lcdcontainer'>
+                                <div class='lcd' id="battery_percent"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1 text-center align-middle">
+                <div id="container" class="statusblockarrow">
+                    <div class="loader">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 text-center">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">SolarBerry<sup class="helptext"><a data-toggle="modal" data-target="#outputmodal"><span class="glyphicon glyphicon-question-sign helpbutton"></sup></a></h3>
+                    </div>
+                    <div class="panel-body">
+                        <img src="images/shippingcontainer.png" class="statusbarimage">
+                    </div>
+                    <div class="panel-footer">
+                        <span>Current Draw(A):</span>
+                        <div style='background-color:black'>
+                            <div class='lcdcontainer'>
+                                <div class='lcd' id="current_out"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Chart 1 -->
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div id='graph1_container'>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+        <div class="row">
+            <div class="col-lg-10 text-center">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <button type="button" class="btn btn-primary btn-xs chart2update chartswitcher_l active" id='graph2daybtn' value='day'>Day</button>
+                        <button type="button" class="btn btn-primary btn-xs chart2update chartswitcher_l active" id='graph2weekbtn' , value='week'>Week</button>
+                        <button type="button" class="btn btn-primary btn-xs chart2update chartswitcher_l disabled" id='graph2monthbtn' value='month'>Month</button>
+                        <button type="button" class="btn btn-primary btn-xs chart2update chartswitcher_l active" id='graph2yearbtn' value='year'>Year</button>
+                        History
+                        <button type="button" class="btn btn-primary btn-xs chart2update chartswitcher_r active" id='graph2sumbtn' value='SUM'>Sum</button>
+                        <button type="button" class="btn btn-primary btn-xs chart2update chartswitcher_r disabled" id='graph2avgbtn' value='AVG'>Average</button>
+                    </div>
+                    <div class="panel-body">
+                        <div id="graph2_container"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 text-center">
+                <div class="panel-body">
+                    <div id="thermometer">
+                    </div>
+                    <h1 id="thermovalue">
+                        </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.container -->
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">SolarBerry Monitoring System</h4>
+                </div>
+                <div class="modal-body">
+                    <img src='images/turingtrustlogo.jpg' width='300px' />
+                    <div class='volunteers'></div>
+                    <img src='images/volunteers.jpg' />
+                    <p>With thanks to:</p>
+                    <ul>
+                        <li>Credit 1</li>
+                        <li>Credit 2</li>
+                        <li>Credit 3</li>
+                        <li>Credit 4</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Sun/Irradiance modal -->
+    <div id="sunmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">What's this?!</h4>
+                </div>
+                <div class="modal-body">
+                    <p> insert some information about what irradiance is here </p>
+                    <div id='sun_frequency' class='queryfrequency'>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- panel modal -->
+    <div id="inputmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">What's this?!</h4>
+                </div>
+                <div class="modal-body">
+                    <p> insert some information about what solar panels are here alongside to any educational content</p>
+                    <div id='input_frequency' class='queryfrequency'>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- battery modal -->
+    <div id="batterymodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">What's this?!</h4>
+                </div>
+                <div class="modal-body">
+                    <p> insert some information about what batteries are here alongside to any educational content</p>
+                    <div id='battery_frequency' class='queryfrequency'>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- SB modal -->
+    <div id="outputmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">What's this?!</h4>
+                </div>
+                <div class="modal-body">
+                    <p> insert some information about what the output is here alongside to any educational content</p>
+                    <div id='output_frequency' class='queryfrequency'>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- battery modal -->
+    <div id="websocketsmodal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">What's this?!</h4>
+                </div>
+                <div class="modal-body">
+                    <span class="label label-default">Unknown</span>
+                    <p>- Something went very wrong, try refreshing the page </p>
+                    <span class="label label-success">Connected</span>
+                    <p>- We're successfully connected to the server and receiving real-time updates</p>
+                    <span class="label label-danger">Disconnected</span>
+                    <p>- We can't reach the server, is server.py running?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <a data-toggle="modal" data-target="#websocketsmodal">
+                    <div class="col-lg-4 text-center" id="websocket_status">
+                        Connection Status: <span class="label label-default">Unknown</span>
+                    </div>
+                </a>
+                <div class="col-lg-4 text-center">
+                    <p>SolarBerry Monitoring System</p>
+                    <p> Designed with care by The Turing Trust 2017</p>
+                </div>
+                <div class="col-lg-4 text-center attribution">
+                    <a data-toggle="modal" data-target="#myModal"> About </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
