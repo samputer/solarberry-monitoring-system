@@ -47,8 +47,10 @@ def main():
 
     # Spin up our controller - this handles everything
     controller_obj.init()
+    time.sleep(3)
     controller_obj.controller_obj = Controller(demo_mode)
-
+    time.sleep(3)
+    
     # We just need this to stop the main thread from completing
     while True:
         logging.info("Server is just fine & dandy!")
