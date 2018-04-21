@@ -37,6 +37,7 @@ import threading
 import time
 import Queue
 import serial
+import random
 from control import controller_obj
 
 class SerialPort:

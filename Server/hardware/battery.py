@@ -74,5 +74,5 @@ class Battery(Sensor):
 
     def sense(self):
         # Cheat a little bit and just tell the controller that we found a result for this on the serial port
-        controller_obj.found_result(self.get_key(), self.get_percentage())
+        controller_obj.controller_obj.found_result(self.get_key(), self.get_percentage())
 
