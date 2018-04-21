@@ -35,7 +35,8 @@ from __future__ import absolute_import
 import logging
 from datetime import datetime
 from hardware.sensor import Sensor
-from control.controller_obj import controller_obj
+import control.controller_obj
+
 
 class Battery(Sensor):
     def __init__(self, name, key, serial_port, demo=False, battery_capacity=10000):
@@ -74,5 +75,5 @@ class Battery(Sensor):
 
     def sense(self):
         # Cheat a little bit and just tell the controller that we found a result for this on the serial port
-        controller_obj.found_result(self.get_key(), self.get_percentage())
+        control.controller_obj.controller_obj.found_result(self.get_key(), self.get_percentage())
 
