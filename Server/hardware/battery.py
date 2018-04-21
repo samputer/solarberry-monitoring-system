@@ -35,7 +35,7 @@ from __future__ import absolute_import
 import logging
 from datetime import datetime
 from hardware.sensor import Sensor
-import control.controller_obj
+from control import controller_obj
 
 class Battery(Sensor):
     def __init__(self, name, key, serial_port, demo=False, battery_capacity=10000):
