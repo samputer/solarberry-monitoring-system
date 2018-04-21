@@ -1,4 +1,3 @@
-controller_obj
 
 def init():
     from control.controller import Controller
