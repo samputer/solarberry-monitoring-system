@@ -33,9 +33,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import absolute_import
 
 import logging
-import datetime
+from datetime import datetime
 from hardware.sensor import Sensor
-import control.controller
+from control import controller_obj
 
 
 class Battery(Sensor):
@@ -75,5 +75,5 @@ class Battery(Sensor):
 
     def sense(self):
         # Cheat a little bit and just tell the controller that we found a result for this on the serial port
-        controller.controller_obj.found_result(self.get_key(), self.get_percentage())
+        controller_obj.controller_obj.found_result(self.get_key(), self.get_percentage())
 
