@@ -35,7 +35,7 @@ from __future__ import absolute_import
 import logging
 import time
 from control.controller import Controller
-import control.controller_obj
+from control import controller_obj
 
 
 def main():
