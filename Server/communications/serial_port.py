@@ -38,7 +38,7 @@ import time
 import Queue
 import serial
 import random
-import control.controller_obj
+from control import controller_obj
 
 class SerialPort:
     def __init__(self, serial_port="/dev/ttyUSB0", demo=False):
@@ -93,14 +93,14 @@ class SerialPort:
                 if serial_response.rstrip() != 'ready':
                     metric = bytes.decode(serial_response).rstrip().split(":")[0]
                     value = bytes.decode(serial_response).rstrip().split(":")[1]
-                    control.controller_obj.controller_obj.found_result(metric, value)
+                    controller_obj.controller_obj.found_result(metric, value)
         else:
             # If we're in demo mode...
             # Return a metric from the write queue and a random number
             if not self.__queue.empty():
                 queue_item = self.__queue.get()
                 logging.debug("Found a request for metric '" + queue_item + "'")
-                control.controller_obj.controller_obj.found_result(queue_item, round(random.uniform(0, 99.9),2))
+                controller_obj.controller_obj.found_result(queue_item, round(random.uniform(0, 99.9),2))
 
         threading.Timer(self.__write_processing_speed, self.continually_process_serial_read_queue).start()
 

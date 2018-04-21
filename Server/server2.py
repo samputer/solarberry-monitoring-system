@@ -35,7 +35,7 @@ from __future__ import absolute_import
 import logging
 import time
 from control.controller import Controller
-import control.controller_obj
+from control import controller_obj
 
 
 def main():
@@ -46,8 +46,8 @@ def main():
     demo_mode = True
 
     # Spin up our controller - this handles everything
-    control.controller_obj.init()
-    control.controller_obj.controller_obj = Controller(demo_mode)
+    controller_obj.init()
+    controller_obj.controller_obj = Controller(demo_mode)
 
     # We just need this to stop the main thread from completing
     while True:
