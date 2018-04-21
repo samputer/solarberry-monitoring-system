@@ -37,7 +37,7 @@ import threading
 import time
 import Queue
 import serial
-from server2 import controller_obj
+from control.controller_obj import controller_obj
 
 class SerialPort:
     def __init__(self, serial_port="/dev/ttyUSB0", demo=False):

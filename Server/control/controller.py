@@ -46,8 +46,6 @@ from communications.metric_logger import MetricLogger
 from communications.websocket_handler import WebsocketHandler
 from control.machine_power_controller import MachinePowerController
 
-controller_obj = ''
-
 
 class Controller:
     def __init__(self, demo=True):
