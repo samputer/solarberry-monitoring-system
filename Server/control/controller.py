@@ -104,6 +104,6 @@ class Controller:
         logging.debug("Looping through " + str(len(self.sensors)) + " sensors to get all of their data")
         for sensor in self.sensors:
             sensor_data = self.sensors[sensor].get_all_data()
-            total_sensor_data[self.sensors[sensor].get_key()]=json.dumps(sensor_data)
+            total_sensor_data[self.sensors[sensor].get_key()] = json.dumps(sensor_data)
         return total_sensor_data
 

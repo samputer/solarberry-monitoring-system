@@ -37,7 +37,7 @@ import threading
 import time
 import Queue
 import serial
-import control.controller
+from control.controller import controller_obj
 
 
 class SerialPort:
@@ -100,7 +100,7 @@ class SerialPort:
             if not self.__queue.empty():
                 queue_item = self.__queue.get()
                 logging.debug("Found a request for metric '" + queue_item + "'")
-                controller.controller_obj.found_result(queue_item, round(random.uniform(0, 99.9),2))
+                controller_obj.found_result(queue_item, round(random.uniform(0, 99.9),2))
 
         threading.Timer(self.__write_processing_speed, self.continually_process_serial_read_queue).start()
 
