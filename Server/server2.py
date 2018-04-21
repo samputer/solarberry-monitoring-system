@@ -47,9 +47,9 @@ def main():
 
     # Spin up our controller - this handles everything
     controller_obj.init()
-    time.sleep(3)
+    # time.sleep(3)
     controller_obj.controller_obj = Controller()
-    time.sleep(3)
+    # time.sleep(3)
     controller_obj.controller_obj.start(demo_mode)
 
     # We just need this to stop the main thread from completing
