@@ -33,7 +33,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import absolute_import
 
 import logging
-import datetime
+from datetime import datetime
 from hardware.sensor import Sensor
 import control.controller
 
