@@ -52,11 +52,6 @@ controller_obj = ''
 class Controller:
     def __init__(self, demo=True):
 
-        # I really didn't want this to be global, but I had problems with the child class for websockets
-        # If theres anything that could warrant being global in this app, its this
-        global controller_obj
-        controller_obj = self
-
         logging.info("Welcome to The Solar Monitoring System for the SolarBerry")
         self.relay_obj = Relay("main_relay", 21)
         self.metric_logger_obj = MetricLogger(demo)  # True puts this into demo mode

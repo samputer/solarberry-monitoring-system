@@ -47,7 +47,8 @@ def main():
     demo_mode = True
 
     # Spin up our controller - this handles everything
-    Controller(demo_mode)
+    global controller_obj
+    controller_obj = Controller(demo_mode)
 
     # We just need this to stop the main thread from completing
     while True:
