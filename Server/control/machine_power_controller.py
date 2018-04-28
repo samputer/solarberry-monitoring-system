@@ -57,23 +57,23 @@ class MachinePowerController:
             logging.debug("IP " + str(idx + 1) + "- " + IP)
         return target_ip_addresses
 
-    def shutdown_all(self, shutdown_time=60):
+    def shutdown_all(self, shutdown_time=3):
         for IP in self.__target_ip_addresses:
             self.shutdown(IP, shutdown_time, True)
 
     def shutdown(self, ip, shutdown_time, warn=True):
         logging.warn("Attempting to shutdown machine with IP:", ip)
-        warning_command = 'zenity --error --title "Power Low"' \
+        warning_command = 'zenity --display=:0 --error --title "Power Low"' \
                           ' --text "The SolarBerry is running low on battery power.\n\n ' \
-                          'This machine will shutdown in 30 seconds.\n\n ' \
+                          'This machine will shutdown in {shutdown_time} minutes.\n\n ' \
                           'Please save any open work." ' \
-                          '--icon-name=battery' + str(
-            shutdown_time) + ' second(s)"'
+                          '--icon-name=battery'.format(shutdown_time=shutdown_time)
         shutdown_command = 'sudo shutdown -P +' + str(shutdown_time)
         full_command = shutdown_command
         ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         if warn:
-            full_command = shutdown_command + warning_command
+            full_command = shutdown_command + " & " + warning_command
         logging.debug("Running command:", full_command)
         try:
             ssh.connect(ip, username=self.__ssh_user, password=self.__ssh_pass)
