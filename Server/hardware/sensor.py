@@ -40,7 +40,7 @@ class Sensor:
         logging.info("Creating " + str(self.__class__.__name__) + " object (" + name + ")")
         self.__name__ = name
         self.__demo = demo
-        self.__key = key  # The key is what is sent to the Arduino tro request a metric
+        self.__key = key  # The key is what is sent to the Arduino to request a metric
         self.__levels = self.get_metric_levels()
         self.__serial_port = serial_port
         self.__results = collections.deque([], 100)

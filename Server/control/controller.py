@@ -46,18 +46,13 @@ from communications.metric_logger import MetricLogger
 from communications.websocket_handler import WebsocketHandler
 from control.machine_power_controller import MachinePowerController
 
-controller_obj = ''
-
 
 class Controller:
-    def __init__(self, demo=True):
-
-        # I really didn't want this to be global, but I had problems with the child class for websockets
-        # If theres anything that could warrant being global in this app, its this
-        global controller_obj
-        controller_obj = self
-
+    def __init__(self):
         logging.info("Welcome to The Solar Monitoring System for the SolarBerry")
+
+    def start(self, demo=True):
+        logging.info("Starting the Controller")
         self.relay_obj = Relay("main_relay", 21)
         self.metric_logger_obj = MetricLogger(demo)  # True puts this into demo mode
         self.machine_power_controller_obj = MachinePowerController()
@@ -73,7 +68,8 @@ class Controller:
         self.sensors["voltage_out"] = Sensor("Output Voltage", "voltage_out", self.serial_port_obj, demo)
         self.sensors["temperature_c"] = Sensor("Temperature in C", "temperature_c", self.serial_port_obj, demo)
         # Our battery object tracks the percentage of the battery
-        self.sensors["battery_percent"] = Battery("battery_percent", "battery_percent", self.serial_port_obj, demo, 1000)  # TODO Change this to an accurate battery size (should probably be a param)
+        self.sensors["battery_percent"] = Battery("battery_percent", "battery_percent", self.serial_port_obj, demo,
+                                                  1000)  # TODO Change this to an accurate battery size (should probably be a param)
 
         self.websocket_handler_obj = WebsocketHandler(5678)
 
@@ -104,6 +100,6 @@ class Controller:
         logging.debug("Looping through " + str(len(self.sensors)) + " sensors to get all of their data")
         for sensor in self.sensors:
             sensor_data = self.sensors[sensor].get_all_data()
-            total_sensor_data[self.sensors[sensor].get_key()]=json.dumps(sensor_data)
+            total_sensor_data[self.sensors[sensor].get_key()] = json.dumps(sensor_data)
         return total_sensor_data
 

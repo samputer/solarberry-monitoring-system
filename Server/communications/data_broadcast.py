@@ -34,7 +34,7 @@ from __future__ import absolute_import
 import logging
 import json
 from communications.websocket_handler import WebSocket
-import control.controller
+from control import controller_obj
 
 
 class DataBroadcast(WebSocket):
@@ -49,6 +49,6 @@ class DataBroadcast(WebSocket):
         logging.debug("Received a message")
         if 'ready' in received_json:
             logging.info("Sending them initial data")
-            data_to_send = control.controller_obj.get_initial_data_to_send()
+            data_to_send = controller_obj.controller_obj.get_initial_data_to_send()
             logging.info("Sending them " + str(json.dumps(data_to_send)))
             self.sendMessage(str(json.dumps(data_to_send)))
