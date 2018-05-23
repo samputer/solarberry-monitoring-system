@@ -311,10 +311,9 @@ function configure_websocket(){
     ws.onmessage = function(event) {
         var indata = event.data;
         var json_data = JSON.parse(indata);
-        console.log(json_data);
 
+        console.log(json_data);
         for (var key in json_data) {
-            console.log(key);
             if ((key == 'initial')) {
                 console.log("Received the initial setup data - Processing it...");
                 // ***** Take a timestamp from the initial data and use it to set the time on the page (Server time!) *****
@@ -329,47 +328,70 @@ function configure_websocket(){
 //                    }
 //                }
 
+
+                for (var metric in json_data){
+                    console.log(metric);
+                }
+
                 // ***** Now you have a bunch of metrics arriving as the payload, loop through themf and do the needful
                 for (var metric in json_data) {
                     console.log("Received initial " + metric + " data");
                     var snapshot = json_data[metric];
+                    //Whilst running locally, this breaks things, can just uncomment as soon as prod
                     // ***** Temperature
-                    if (metric == 'temperature_c') {
-                        snapshotsJSON = JSON.parse(snapshot);
-                        $('#thermometer').thermometer('setValue', 100);
-                    }
+                    // if (metric == 'temperature_c') {
+                    //     snapshotsJSON = JSON.parse(snapshot);
+                    //     $('#thermometer').thermometer('setValue', 100);
+                    // }
 
                     // ***** Graph 1
-                    else if (metric == 'graph1') {
-                        snapshotsJSON = JSON.parse(snapshot);
+                    if (metric == 'graph1') {
+                        console.log("Got graph1 data");
+                        console.log(snapshot)
+                        snapshotsJSON = (snapshot);
                         // // Get all of the snapshots within the block and process them one by one
                         for (var snapshot_index in snapshotsJSON) {
+
                         // //     // ***** Update graph1 with each snapshot
                             var entry = snapshotsJSON[snapshot_index];
                             process_graph1(entry, false);
                         }
                     }
 
-//                    else{
-//                        $('#' + metric).fadeOut('fast');
-//                    }
+                    else if (metric != 'initial'){
+                        console.log(metric)
+                        snapshotsJSON = JSON.parse(snapshot);
+                        metric_value = snapshotsJSON[snapshotsJSON.length-1]['value'];
+                        level = snapshotsJSON[snapshotsJSON.length-1]['level'];
+                                                console.log(metric_value)
+                        console.log(level);
+                        // TODO - Make these fade-in again
+                        $('#' + metric).sevenSeg({ value: metric_value });
+                        $('#' + metric + ' .sevenSeg-segOn').css('fill', sevensegcolours[level]['on']);
+                        $('#' + metric + ' .sevenSeg-svg').css('fill', '"' + sevensegcolours[level]['off'] + '"');
+                    }
 
-//                    else{
-//                        if (metric != 'initial'){
-//                        console.log("***"+metric);
-//                        snapshotsJSON = JSON.parse(snapshot);
-//                        console.log(snapshotsJSON[snapshotsJSON.length-1]);
-//                        metric_value = snapshotsJSON[snapshotsJSON.length-1]['value'];
-//                        level = snapshotsJSON[snapshotsJSON.length-1]['level'];
-//                        if (metric_value != undefined){
-////                            $('#' + metric).fadeOut('fast', function() {
-//                            $('#' + metric).sevenSeg({ value: metric_value });
-////                            $('#' + metric + ' .sevenSeg-segOn').css('fill', sevensegcolours[level]['on']);
-////                            $('#' + metric + ' .sevenSeg-svg').css('fill', '"' + sevensegcolours[level]['off'] + '"');
-////                            $('#' + metric).fadeIn('fast');
-////                    });
-//                        }
-//                        }
+                   // else if (metric != 'initial'){
+                   //     console.log("***"+metric);
+                   //     snapshotsJSON = JSON.parse(snapshot);
+                   //     // console.log(snapshotsJSON[snapshotsJSON.length-1]);
+                   //     metric_value = snapshotsJSON[snapshotsJSON.length-1]['value'];
+                   //     level = snapshotsJSON[snapshotsJSON.length-1]['level'];
+                   //
+                   //     console.log(snapshotsJSON);
+                   //
+                   //     if (metric_value != undefined){
+                   //         $('#' + metric).fadeOut('fast', function() {
+                   //         $('#' + metric).sevenSeg({ value: metric_value });
+                   //
+                   //         // console.log(level)
+                   //
+                   //         $('#' + metric + ' .sevenSeg-segOn').css('fill', sevensegcolours[level]['on']);
+                   //         $('#' + metric + ' .sevenSeg-svg').css('fill', '"' + sevensegcolours[level]['off'] + '"');
+                   //         $('#' + metric).fadeIn('fast');
+                   //      });
+                   //     }
+                   //     }
 //                        console.log(json_data[metric].length);
 //                        console.log(json_data[metric]);
 //                        if (json_data[metric] != undefined){
@@ -501,6 +523,7 @@ $(document).ready(function() {
 
 function process_graph1(entry, scroll) {
     // entry = JSON.parse(entry);
+    console.log(entry);
     graph1data[0].push(new Date(entry["timestamp"]).toISOString());
     graph1data[1].push(entry['value']["temperature_c"]["value"]);
     graph1data[2].push(entry["value"]["irradiance"]["value"]);

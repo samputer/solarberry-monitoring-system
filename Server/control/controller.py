@@ -85,7 +85,7 @@ class Controller:
         level = self.sensors[metric].get_level(value)
 
         # Put the result onto the sensor object
-        self.sensors[metric].add_result(value, now, level)
+        self.sensors[metric].add_result(value, level, now)
 
         # If we've found a result for either of the current metrics, then use them to update the battery status
         if metric == 'current_in' or metric == 'current_out':
@@ -96,10 +96,41 @@ class Controller:
 
     def get_initial_data_to_send(self):
         # Loop through all of our sensor objects and ask them all to give us everything they have
-        total_sensor_data = {"initial":True}
+        total_sensor_data = {"initial":datetime.utcnow().isoformat() + 'Z'}
         logging.debug("Looping through " + str(len(self.sensors)) + " sensors to get all of their data")
         for sensor in self.sensors:
             sensor_data = self.sensors[sensor].get_all_data()
             total_sensor_data[self.sensors[sensor].get_key()] = json.dumps(sensor_data)
+
+            # total_sensor_data['graph1'][self.sensors[sensor].get_key()] = json.dumps(sensor_data)
+        # total_sensor_data['graph1'] = {'irradiance': {'timestamp':'2017-04-16 11:40:49', 'category':'sun', 'metric':'irradiance', 'value':'1','level':'ok'},
+        #                'temperature_c': {'timestamp':'2017-04-16 11:40:49', 'category':'temperature', 'metric':'temperature_c', 'value':'1','level':'ok'},
+        #                'current_in': {'timestamp':'2017-04-16 11:40:49', 'category':'input', 'metric':'current_in', 'value':'1','level':'ok'},
+        #                'current_out':{'timestamp':'2017-04-16 11:40:49', 'category':'output', 'metric':'current_out', 'value':'1','level':'ok'},
+        #                'voltage_in':{'timestamp':'2017-04-16 11:40:49', 'category':'input', 'metric':'voltage_in', 'value':'1','level':'ok'},
+        #                'voltage_out':{'timestamp':'2017-04-16 11:40:49', 'category':'output', 'metric':'voltage_out', 'value':'1','level':'ok'},
+        #                'battery_percent':{'timestamp':'2017-04-16 11:40:49', 'category':'battery', 'metric':'battery_percent', 'value':'1','level':'ok'}}
+
+        total_sensor_data['graph1'] = [{
+            'timestamp': '2017-04-16 11:40:49',
+            'value': {
+            'irradiance': {'timestamp': '2017-04-16 11:40:49', 'category': 'sun', 'metric': 'irradiance', 'value': '1',
+                           'level': 'ok'},
+            'temperature_c': {'timestamp': '2017-04-16 11:40:49', 'category': 'temperature', 'metric': 'temperature_c',
+                              'value': '1', 'level': 'ok'},
+            'current_in': {'timestamp': '2017-04-16 11:40:49', 'category': 'input', 'metric': 'current_in',
+                           'value': '1', 'level': 'ok'},
+            'current_out': {'timestamp': '2017-04-16 11:40:49', 'category': 'output', 'metric': 'current_out',
+                            'value': '1', 'level': 'ok'},
+            'voltage_in': {'timestamp': '2017-04-16 11:40:49', 'category': 'input', 'metric': 'voltage_in',
+                           'value': '1', 'level': 'ok'},
+            'voltage_out': {'timestamp': '2017-04-16 11:40:49', 'category': 'output', 'metric': 'voltage_out',
+                            'value': '1', 'level': 'ok'},
+            'battery_percent': {'timestamp': '2017-04-16 11:40:49', 'category': 'battery', 'metric': 'battery_percent',
+                                'value': '1', 'level': 'ok'}
+            }
+        }]
+
+
         return total_sensor_data
 
