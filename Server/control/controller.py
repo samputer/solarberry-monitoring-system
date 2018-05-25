@@ -39,6 +39,7 @@ from hardware.relay import Relay
 from hardware.battery import Battery
 from hardware.calibrate_button import CalibrateButton
 from hardware.relay_override_button import RelayOverrideButton
+from hardware.graph1 import Graph1
 from hardware.sensor import Sensor
 from control.sensor_watcher import SensorWatcher
 from communications.serial_port import SerialPort
@@ -70,6 +71,7 @@ class Controller:
         # Our battery object tracks the percentage of the battery
         self.sensors["battery_percent"] = Battery("battery_percent", "battery_percent", self.serial_port_obj, demo,
                                                   1000)  # TODO Change this to an accurate battery size (should probably be a param)
+        self.sensors["graph1"] = Graph1("graph1", "graph1", self.serial_port_obj, demo)
 
         self.websocket_handler_obj = WebsocketHandler(5678)
 
@@ -96,41 +98,14 @@ class Controller:
 
     def get_initial_data_to_send(self):
         # Loop through all of our sensor objects and ask them all to give us everything they have
-        total_sensor_data = {"initial":datetime.utcnow().isoformat() + 'Z'}
+        total_sensor_data = {"initial": datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+
         logging.debug("Looping through " + str(len(self.sensors)) + " sensors to get all of their data")
         for sensor in self.sensors:
             sensor_data = self.sensors[sensor].get_all_data()
             total_sensor_data[self.sensors[sensor].get_key()] = json.dumps(sensor_data)
-
-            # total_sensor_data['graph1'][self.sensors[sensor].get_key()] = json.dumps(sensor_data)
-        # total_sensor_data['graph1'] = {'irradiance': {'timestamp':'2017-04-16 11:40:49', 'category':'sun', 'metric':'irradiance', 'value':'1','level':'ok'},
-        #                'temperature_c': {'timestamp':'2017-04-16 11:40:49', 'category':'temperature', 'metric':'temperature_c', 'value':'1','level':'ok'},
-        #                'current_in': {'timestamp':'2017-04-16 11:40:49', 'category':'input', 'metric':'current_in', 'value':'1','level':'ok'},
-        #                'current_out':{'timestamp':'2017-04-16 11:40:49', 'category':'output', 'metric':'current_out', 'value':'1','level':'ok'},
-        #                'voltage_in':{'timestamp':'2017-04-16 11:40:49', 'category':'input', 'metric':'voltage_in', 'value':'1','level':'ok'},
-        #                'voltage_out':{'timestamp':'2017-04-16 11:40:49', 'category':'output', 'metric':'voltage_out', 'value':'1','level':'ok'},
-        #                'battery_percent':{'timestamp':'2017-04-16 11:40:49', 'category':'battery', 'metric':'battery_percent', 'value':'1','level':'ok'}}
-
-        total_sensor_data['graph1'] = [{
-            'timestamp': '2017-04-16 11:40:49',
-            'value': {
-            'irradiance': {'timestamp': '2017-04-16 11:40:49', 'category': 'sun', 'metric': 'irradiance', 'value': '1',
-                           'level': 'ok'},
-            'temperature_c': {'timestamp': '2017-04-16 11:40:49', 'category': 'temperature', 'metric': 'temperature_c',
-                              'value': '1', 'level': 'ok'},
-            'current_in': {'timestamp': '2017-04-16 11:40:49', 'category': 'input', 'metric': 'current_in',
-                           'value': '1', 'level': 'ok'},
-            'current_out': {'timestamp': '2017-04-16 11:40:49', 'category': 'output', 'metric': 'current_out',
-                            'value': '1', 'level': 'ok'},
-            'voltage_in': {'timestamp': '2017-04-16 11:40:49', 'category': 'input', 'metric': 'voltage_in',
-                           'value': '1', 'level': 'ok'},
-            'voltage_out': {'timestamp': '2017-04-16 11:40:49', 'category': 'output', 'metric': 'voltage_out',
-                            'value': '1', 'level': 'ok'},
-            'battery_percent': {'timestamp': '2017-04-16 11:40:49', 'category': 'battery', 'metric': 'battery_percent',
-                                'value': '1', 'level': 'ok'}
-            }
-        }]
-
+        graph1_data = self.sensors['graph1'].get_all_data()
+        total_sensor_data['graph1'] = json.dumps(graph1_data)
 
         return total_sensor_data
 

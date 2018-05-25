@@ -35,7 +35,6 @@ var readytoroll = false;
 var graph1data = [
     ['x'],
     ['temperature_c'],
-    ['irradiance'],
     ['voltage_out'],
     ['voltage_in'],
     ['battery_percent'],
@@ -46,7 +45,6 @@ var graph1;
 var graph2data = [
     ['x'],
     ['temperature_c'],
-    ['irradiance'],
     ['voltage_out'],
     ['voltage_in'],
     ['battery_percent'],
@@ -312,7 +310,7 @@ function configure_websocket(){
         var indata = event.data;
         var json_data = JSON.parse(indata);
 
-        console.log(json_data);
+        // console.log(json_data);
         for (var key in json_data) {
             if ((key == 'initial')) {
                 console.log("Received the initial setup data - Processing it...");
@@ -328,27 +326,21 @@ function configure_websocket(){
 //                    }
 //                }
 
-
-                for (var metric in json_data){
-                    console.log(metric);
-                }
-
                 // ***** Now you have a bunch of metrics arriving as the payload, loop through themf and do the needful
                 for (var metric in json_data) {
                     console.log("Received initial " + metric + " data");
                     var snapshot = json_data[metric];
                     //Whilst running locally, this breaks things, can just uncomment as soon as prod
                     // ***** Temperature
-                    // if (metric == 'temperature_c') {
-                    //     snapshotsJSON = JSON.parse(snapshot);
-                    //     $('#thermometer').thermometer('setValue', 100);
-                    // }
+                    if (metric == 'temperature_c') {
+                        snapshotsJSON = JSON.parse(snapshot);
+                        $('#thermometer').thermometer('setValue', 100);
+                    }
 
                     // ***** Graph 1
                     if (metric == 'graph1') {
                         console.log("Got graph1 data");
-                        console.log(snapshot)
-                        snapshotsJSON = (snapshot);
+                        snapshotsJSON = JSON.parse(snapshot);
                         // // Get all of the snapshots within the block and process them one by one
                         for (var snapshot_index in snapshotsJSON) {
 
@@ -359,13 +351,9 @@ function configure_websocket(){
                     }
 
                     else if (metric != 'initial'){
-                        console.log(metric)
                         snapshotsJSON = JSON.parse(snapshot);
                         metric_value = snapshotsJSON[snapshotsJSON.length-1]['value'];
                         level = snapshotsJSON[snapshotsJSON.length-1]['level'];
-                                                console.log(metric_value)
-                        console.log(level);
-                        // TODO - Make these fade-in again
                         $('#' + metric).sevenSeg({ value: metric_value });
                         $('#' + metric + ' .sevenSeg-segOn').css('fill', sevensegcolours[level]['on']);
                         $('#' + metric + ' .sevenSeg-svg').css('fill', '"' + sevensegcolours[level]['off'] + '"');
@@ -464,8 +452,6 @@ function configure_websocket(){
                 if ($('#' + json_data['metric']).length) {
                     $('#' + json_data['metric']).fadeOut('fast', function() {
                         $('#' + json_data['metric']).sevenSeg({ value: json_data['value'] });
-                        console.log()
-                        // console.log('#'+json_data['metric']+'> .sevenSeg-segOn');
                         $('#' + json_data['metric'] + ' .sevenSeg-segOn').css('fill', sevensegcolours[json_data['level']]['on']);
                         $('#' + json_data['metric'] + ' .sevenSeg-svg').css('fill', '"' + sevensegcolours[json_data['level']]['off'] + '"');
                         $('#' + json_data['metric']).fadeIn('fast')
@@ -518,20 +504,19 @@ $(document).ready(function() {
 
 });
 
-
-
-
 function process_graph1(entry, scroll) {
     // entry = JSON.parse(entry);
-    console.log(entry);
-    graph1data[0].push(new Date(entry["timestamp"]).toISOString());
-    graph1data[1].push(entry['value']["temperature_c"]["value"]);
-    graph1data[2].push(entry["value"]["irradiance"]["value"]);
-    graph1data[3].push(entry["value"]["voltage_out"]["value"]);
-    graph1data[4].push(entry["value"]["voltage_in"]["value"]);
-    graph1data[5].push(entry["value"]["battery_percent"]["value"]);
-    graph1data[6].push(entry["value"]["current_in"]["value"]);
-    graph1data[7].push(entry["value"]["current_out"]["value"]);
+
+    snapshot_timestamp = new Date(entry["timestamp"]);
+    graph1data[0].push(snapshot_timestamp.toISOString());
+    metrics = ["temperature_c", "voltage_out", "voltage_in", "battery_percent", "current_in", "current_out"];
+    for (var i=0; i< metrics.length; i++){
+        var metric = metrics[i];
+        var value = entry["value"]['value'][metric];
+        if ((value != undefined)){
+            graph1data[i+1].push(value['value']);
+        }
+    }
 
     if (scroll) {
         for (var i = graph1data.length - 1; i >= 0; i--) {
