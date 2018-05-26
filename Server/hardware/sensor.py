@@ -44,6 +44,7 @@ class Sensor:
         self.__levels = self.get_metric_levels()
         self.__serial_port = serial_port
         self.__results = collections.deque([], 100)
+        self.__last_snapshot = None
 
     def setup_database_connection(self):
         logging.info("Setting up metric levels database connection")
@@ -63,8 +64,8 @@ class Sensor:
 
     def get_metric_levels(self):
         levels = {'danger': {'min': 0, 'max': 50},
-                  'warning': {'min': 51, 'max': 75},
-                  'ok': {'min': 76, 'max': 9999}}
+                  'warning': {'min': 50.001, 'max': 75},
+                  'ok': {'min': 75.001, 'max': 9999}}
         if not self.__demo:
             # Query the database and cache all of the levels associated with this metric
             database_connection = self.setup_database_connection()
@@ -77,7 +78,7 @@ class Sensor:
         return levels
 
     def get_level(self, value):
-        level = ''
+        level = 'ok'
         for key in self.__levels:
             if self.__levels[key]['min'] <= value <= self.__levels[key]['max']:
                 level = key
@@ -86,11 +87,16 @@ class Sensor:
 
     def add_result(self, value, level, timestamp):
         logging.debug("adding result")
-        self.__results.append({"timestamp": timestamp, "value": value, "level": level})
+        snapshot = {"timestamp": timestamp, "value": value, "level": level}
+        self.__results.append(snapshot)
+        self.__last_snapshot = snapshot
 
     def get_all_data(self):
         all_data = list(self.__results)
         return all_data
+
+    def get_last_snapshot(self):
+        return self.__last_snapshot
 
     def sense(self):
         self.__serial_port.add_query(self.__key)
