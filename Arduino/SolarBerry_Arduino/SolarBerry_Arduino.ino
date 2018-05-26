@@ -45,9 +45,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // See https://cdn-learn.adafruit.com/downloads/pdf/adafruit-ina219-current-sensor-breakout.pdf for jumper config
 Adafruit_INA219 ina219_in(0x41);
 Adafruit_INA219 ina219_out(0x44);
-Adafruit_INA219 ina219_irradiance(0x40);
+Adafruit_INA219 ina219_batt(0x40);
 
-#define IRRADIANCE 0
+#define CURRENT_BATTERY 0
 #define CURRENT_IN 1
 #define TEMPERATURE_C 2
 #define VOLTAGE_IN 3
@@ -75,8 +75,8 @@ int relayPin = 12;
 
 // List of all metrics, their default values, names and units
 String metrics[7] = {"???", "???", "???", "???", "???", "???", "???"};
-String metricnames[7] = {"Irr","Curr in", "Temp", "V in", "Batt %", "Batt V", "Curr out"};
-String metricunits[7] = {"W\057m^2", "A", "\337C", "V", "%", "V", "A"};
+String metricnames[7] = {"Curr Batt","Curr in", "Temp", "V in", "Batt %", "Batt V", "Curr out"};
+String metricunits[7] = {"A", "A", "\337C", "V", "%", "V", "A"};
 
 int lastDisplayedOnScreen = 0;
 
@@ -158,10 +158,11 @@ void setup() {
   // you can call a setCalibration function to change this range (see comments).
   ina219_in.begin();
   ina219_out.begin();
-  ina219_irradiance.begin();
+  ina219_batt.begin();
   // To use a slightly lower 32V, 1A range (higher precision on amps):
   ina219_in.setCalibration_32V_1A();
   ina219_out.setCalibration_32V_1A();
+  ina219_batt.setCalibration_32V_1A();
   // Or to use a lower 16V, 400mA range (higher precision on volts and amps):
   //ina219.setCalibration_16V_400mA();
   
@@ -198,10 +199,11 @@ void loop() {
       Serial.println(in + ":" + valueString);
       metrics[TEMPERATURE_C] = valueString;
     }
-    else if ((in == "irradiance")&&(readytoroll)) {
-      String valueString = String(random(0,99.9));
+    else if ((in == "current_battery")&&(readytoroll)) {
+      float current_mA = ina219_out.getCurrent_mA();
+      String valueString = String(current_mA);
       Serial.println(in + ":" + valueString);
-      metrics[IRRADIANCE] = valueString;
+      metrics[CURRENT_BATTERY] = valueString;
     }
     else if ((in == "current_out")&&(readytoroll)) {
       float current_mA = ina219_out.getCurrent_mA();
@@ -215,40 +217,43 @@ void loop() {
       Serial.println(in + ":" + valueString);
       metrics[VOLTAGE_IN] = valueString;
     }
-    else if ((in == "battery_percent")&&(readytoroll)) {
+    else if ((in.startsWith("battery_percent"))&&(readytoroll)) {
       
-      // Get current in
-      float current_in = ina219_in.getCurrent_mA();
-
-      // Get current out
-      float current_out = ina219_out.getCurrent_mA();
-      
-      // Work out what they are as Ah, divide it by the frequency of polling
-      int Ah_divisor = 3600/battery_percent_query_frequency;
-
-      float Ah_in = current_in/Ah_divisor;
-      float Ah_out = current_out/Ah_divisor;
-
-//       Serial.println(Ah_in);
-//       Serial.println(Ah_out);
-
-      battery_Ah = battery_Ah + Ah_in - Ah_out;
-
-//      Serial.println(battery_Ah);
+//      // Get current in
+//      float current_in = ina219_in.getCurrent_mA();
 //
-//      Serial.println("total"+String(total_battery_Ah));
-//      Serial.println("battery"+String(battery_Ah));
-//      Serial.println(float(100)/float(total_battery_Ah));
-      float battery_percent = (float(100) / float(total_battery_Ah)) * battery_Ah;
-      
-//      Serial.println("batterypct"+String(battery_percent));
-
-      float value = battery_percent;
-
-      String valueString = String(value);
-      Serial.println(in + ":" + valueString);
-      metrics[BATTERY_PERCENT] = valueString;
-      
+//      // Get current out
+//      float current_out = ina219_out.getCurrent_mA();
+//      
+//      // Work out what they are as Ah, divide it by the frequency of polling
+//      int Ah_divisor = 3600/battery_percent_query_frequency;
+//
+//      float Ah_in = current_in/Ah_divisor;
+//      float Ah_out = current_out/Ah_divisor;
+//
+////       Serial.println(Ah_in);
+////       Serial.println(Ah_out);
+//
+//      battery_Ah = battery_Ah + Ah_in - Ah_out;
+//
+////      Serial.println(battery_Ah);
+////
+////      Serial.println("total"+String(total_battery_Ah));
+////      Serial.println("battery"+String(battery_Ah));
+////      Serial.println(float(100)/float(total_battery_Ah));
+//      float battery_percent = (float(100) / float(total_battery_Ah)) * battery_Ah;
+//      
+////      Serial.println("batterypct"+String(battery_percent));
+//
+//      float value = battery_percent;
+//
+//      String valueString = String(value);
+//      Serial.println(in + ":" + valueString);
+      String pct = getValue(in,'_',2);
+      metrics[BATTERY_PERCENT] = pct;
+      Serial.println("battery_percent:" + pct);
+//
+//      
     }
     else if ((in == "voltage_out")&&(readytoroll)) {
       float busvoltage = ina219_out.getBusVoltage_V();
@@ -282,11 +287,11 @@ void controlPower(bool on){
   }
 }
 
-void updateMetric(String in, float value){
-      String valueString = String(value);
-      Serial.println(in + ":" + valueString);
-      metrics[IRRADIANCE] = valueString;
-}
+//void updateMetric(String in, float value){
+//      String valueString = String(value);
+//      Serial.println(in + ":" + valueString);
+//      metrics[CURRENT_BATTERY] = valueString;
+//}
 
 void establishContact() {
   while (Serial.available() <= 0) {
