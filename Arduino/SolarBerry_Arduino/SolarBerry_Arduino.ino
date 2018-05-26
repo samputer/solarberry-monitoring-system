@@ -43,9 +43,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 // See https://cdn-learn.adafruit.com/downloads/pdf/adafruit-ina219-current-sensor-breakout.pdf for jumper config
-Adafruit_INA219 ina219_in(0x41);
-Adafruit_INA219 ina219_out(0x44);
-Adafruit_INA219 ina219_batt(0x40);
+
+
+
+Adafruit_INA219 ina219_in(0x41); // A0 shorted
+Adafruit_INA219 ina219_out(0x44); // A1 shorted
+Adafruit_INA219 ina219_batt(0x40); // A0 & A1 shorted
 
 #define CURRENT_BATTERY 0
 #define CURRENT_IN 1
@@ -187,7 +190,7 @@ void loop() {
       setColour(0, 255, 255);  // update the RGB LED to aqua
     }
     else if ((in == "current_in")&&(readytoroll)) {
-      float current_mA = ina219_in.getCurrent_mA();
+      float current_mA = ina219_in.getCurrent_mA()/1000;
       String valueString = String(current_mA);
       Serial.println(in + ":" + valueString);
       metrics[CURRENT_IN] = valueString;
@@ -200,13 +203,13 @@ void loop() {
       metrics[TEMPERATURE_C] = valueString;
     }
     else if ((in == "current_battery")&&(readytoroll)) {
-      float current_mA = ina219_out.getCurrent_mA();
+      float current_mA = ina219_out.getCurrent_mA()/1000;
       String valueString = String(current_mA);
       Serial.println(in + ":" + valueString);
       metrics[CURRENT_BATTERY] = valueString;
     }
     else if ((in == "current_out")&&(readytoroll)) {
-      float current_mA = ina219_out.getCurrent_mA();
+      float current_mA = ina219_out.getCurrent_mA()/1000;
       String valueString = String(current_mA);
       Serial.println(in + ":" + valueString);
       metrics[CURRENT_OUT] = valueString;
