@@ -164,9 +164,12 @@ void setup() {
   ina219_out.begin();
   ina219_batt.begin();
   // To use a slightly lower 32V, 1A range (higher precision on amps):
-  ina219_in.setCalibration_solarberry();
-  ina219_out.setCalibration_solarberry();
-  ina219_batt.setCalibration_solarberry();
+//  ina219_in.setCalibration_solarberry();
+//  ina219_out.setCalibration_solarberry();
+//  ina219_batt.setCalibration_solarberry();
+  ina219_in.setCalibration_32V_1A();
+  ina219_out.setCalibration_32V_1A();
+  ina219_batt.setCalibration_32V_1A();
   // Or to use a lower 16V, 400mA range (higher precision on volts and amps):
   //ina219.setCalibration_16V_400mA();
   
@@ -203,7 +206,7 @@ void loop() {
       metrics[TEMPERATURE_C] = valueString;
     }
     else if ((in == "current_battery")&&(readytoroll)) {
-      float current_mA = ina219_batt.getCurrent_mA()/1000;
+      float current_mA = ina219_batt.getCurrent_mA();
       String valueString = String(current_mA);
       Serial.println(in + ":" + valueString);
       metrics[CURRENT_BATTERY] = valueString;

@@ -51,19 +51,15 @@ class SerialPort:
         self.__queue = Queue.Queue()
         if not self.__demo:
             with self.__serial_thread_lock:
-                print("WRITING INIT TO SERIAL")
                 self.__serial_connection = serial.Serial(serial_port, self.__baud_rate)  # 9600 is the baud rate
                 time.sleep(2)
-                self.__serial_connection.write(
-                    "init_10000_10_100")  # TODO - modify the Arduino code, this is no longer reqd
+                self.__serial_connection.write("init")  # TODO - modify the Arduino code, this is no longer reqd
 
         time.sleep(10)
-        serial_writer_thread = threading.Thread(target=self.continually_process_serial_write_queue,
-                                                args=())
+        serial_writer_thread = threading.Thread(target=self.continually_process_serial_write_queue, args=())
         serial_writer_thread.daemon = True
         serial_writer_thread.start()
-        serial_reader_thread = threading.Thread(target=self.continually_process_serial_read_queue,
-                                                args=())
+        serial_reader_thread = threading.Thread(target=self.continually_process_serial_read_queue, args=())
         serial_reader_thread.daemon = True
         serial_reader_thread.start()
 
@@ -89,7 +85,6 @@ class SerialPort:
             with self.__serial_thread_lock:
                 serial_response = self.__serial_connection.readline()
                 bytes.decode(serial_response)
-                print("*"+serial_response.rstrip()+"*")
                 if serial_response.rstrip() != 'ready':
                     metric = bytes.decode(serial_response).rstrip().split(":")[0]
                     value = bytes.decode(serial_response).rstrip().split(":")[1]
