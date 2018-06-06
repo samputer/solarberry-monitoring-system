@@ -43,7 +43,7 @@ def main():
     logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level="DEBUG")
 
     # Should we fake all sorts of things? (no db/no serial/no shutdown/no relay)
-    demo_mode = True
+    demo_mode = False 
 
     # Spin up our controller - this handles everything
     controller_obj.init()

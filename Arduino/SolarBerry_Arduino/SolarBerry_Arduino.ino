@@ -57,6 +57,7 @@ Adafruit_INA219 ina219_batt(0x40); // A0 & A1 shorted
 #define BATTERY_PERCENT 4
 #define VOLTAGE_OUT 5
 #define CURRENT_OUT 6
+#define VOLTAGE_BATTERY 7
 
 // ***** PIN DEFINITIONS *****
 // RGB LED
@@ -77,9 +78,9 @@ int OneWirePin = 8;
 int relayPin = 12;
 
 // List of all metrics, their default values, names and units
-String metrics[7] = {"???", "???", "???", "???", "???", "???", "???"};
-String metricnames[7] = {"Curr Batt","Curr in", "Temp", "V in", "Batt %", "Batt V", "Curr out"};
-String metricunits[7] = {"A", "A", "\337C", "V", "%", "V", "A"};
+String metrics[8] = {"???", "???", "???", "???", "???", "???", "???", "???"};
+String metricnames[8] = {"Curr Batt","Curr in", "Temp", "V in", "Batt %", "Batt V", "Curr out", "Batt V"};
+String metricunits[8] = {"A", "A", "\337C", "V", "%", "V", "A", "V"};
 
 int lastDisplayedOnScreen = 0;
 
@@ -163,6 +164,9 @@ void setup() {
   ina219_out.begin();
   ina219_batt.begin();
   // To use a slightly lower 32V, 1A range (higher precision on amps):
+//  ina219_in.setCalibration_solarberry();
+//  ina219_out.setCalibration_solarberry();
+//  ina219_batt.setCalibration_solarberry();
   ina219_in.setCalibration_32V_1A();
   ina219_out.setCalibration_32V_1A();
   ina219_batt.setCalibration_32V_1A();
@@ -185,7 +189,6 @@ void loop() {
     // get incoming byte:
     in = Serial.readStringUntil('\n');
     if(in.startsWith("init")){
-      String part01 = getValue(in,'_',1);
       readytoroll = true;
       setColour(0, 255, 255);  // update the RGB LED to aqua
     }
@@ -203,7 +206,7 @@ void loop() {
       metrics[TEMPERATURE_C] = valueString;
     }
     else if ((in == "current_battery")&&(readytoroll)) {
-      float current_mA = ina219_out.getCurrent_mA()/1000;
+      float current_mA = ina219_batt.getCurrent_mA();
       String valueString = String(current_mA);
       Serial.println(in + ":" + valueString);
       metrics[CURRENT_BATTERY] = valueString;
@@ -219,6 +222,12 @@ void loop() {
       String valueString = String(busvoltage);
       Serial.println(in + ":" + valueString);
       metrics[VOLTAGE_IN] = valueString;
+    }
+    else if ((in == "voltage_battery")&&(readytoroll)) {
+      float busvoltage = ina219_batt.getBusVoltage_V();
+      String valueString = String(busvoltage);
+      Serial.println(in + ":" + valueString);
+      metrics[VOLTAGE_BATTERY] = valueString;
     }
     else if ((in.startsWith("battery_percent"))&&(readytoroll)) {
       
